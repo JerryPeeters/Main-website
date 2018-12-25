@@ -16,7 +16,7 @@ MongoClient.connect(url, {useNewUrlParser: true })
 .then( console.log('test2') )
 .catch( err => console.log(err) );
 
-
+even testen
 
 // setTimeout( () => { 
 //     client1.close()
