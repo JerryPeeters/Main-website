@@ -2,7 +2,7 @@
 
 let http = require('http'),
     getTimeStamp = require('./modules/getTimeStamp'),
-    port = 8080,
+    port = require('./port').portnumber,
     send404 = require('./modules/send404'),
     db = require('./db');
 

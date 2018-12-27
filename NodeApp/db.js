@@ -2,6 +2,9 @@
 
 let MongoClient = require('mongodb').MongoClient,
     url = 'mongodb://localhost:27017/',
+    
+    /*if using multiple dbNames, you can add dbNames as the third
+    function Arg and remove this variable */
     dbName = 'droplet01';
 
 module.exports.queryCollection = queryCollection;
