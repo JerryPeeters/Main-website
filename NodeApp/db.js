@@ -1,91 +1,26 @@
 'use strict';
 
 let MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:27017/';
+    url = 'mongodb://localhost:27017/',
+    dbName = 'droplet01';
 
-// module.exports.printCollection = printCollection;
+module.exports.queryCollection = queryCollection;
 
+async function queryCollection(colName, query) {
+    try {
+    let client = await MongoClient.connect(url, { useNewUrlParser: true });
+    console.log(`Connected to Mongod: ${client.isConnected()}`);
+    
+    let database = client.db( `${dbName}` );
+    let collection = await database.collection(`${colName}`);
+    let results = await collection.find(query).toArray();
 
-MongoClient.connect(url, {useNewUrlParser: true })
-.then( client => {
-    console.log('connection opened.');
-    return client;
-})
-// .then( client => client.close() )
-// .then( console.log('connection closed') )
-.then( console.log('test2') )
-.catch( err => console.log(err) );
+    await client.close();
+    console.log( `Connection to Mongod closed: ${!client.isConnected()}` );
 
-even testen
-
-// setTimeout( () => { 
-//     client1.close()
-//     .then( console.log('connection closed.') )
-//     .catch( err => console.log(err) );
-// }, 5000);
-
-// function openConnection() {
-//     let newClient
-    
-//     MongoClient.connect(url, {useNewUrlParser: true })
-//     .then( client => { 
-//         newClient = client;
-//         console.log('connection opened.');
-//         return newClient; 
-//     })
-//     .catch( err => console.log(err) );
-// };
-
-
-
-
-
-// function printCollection(dbName, colName) {
-//     let result
-//     //This returns a promise, with a connectedclient as result or error
-    
-    
-//     MongoClient.connect(url, {useNewUrlParser: true })
-//     .then( client => client.db(`${dbName}`) )
-//     .then( db => db.collection(`${colName}`) )
-//     .then( collection => collection.find().toArray() )
-//     .then( arr => result = arr)
-//     .then() 
-//     .catch( err => console.log(err) );
-    
-    
-    
-    
-    
-    
-    
-//     let result = 'test1';
-    
-    
-    
-    
-    
-    
-//     let dbClient = MongoClient.connect(url,
-//                         { useNewUrlParser: true }, 
-//                         function(err, newClient) {
-//                             if (err) return `${err}`;
-//                             return newClient;
-//                         });
-    
-//     console.log(dbClient); //hier een errorcheck maken
-    
-//     let db = dbClient.db(`${dbName}`);
-    
-//     result = db.collection(`${colName}`).find().toArray( (err, arr) => {
-//         if (err) return `${err}`;
-//         return arr;
-//     });
-//     console.log(result);
-//     dbClient.close();
-//     return result;
-// }
-    
-
-    
-
+    return results;
+    } catch(err) {
+        console.log(`The following error occurred when accessing the db: ${err}`);
+        return err;
+    }
+}
