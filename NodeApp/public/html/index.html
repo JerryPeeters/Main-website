@@ -30,6 +30,7 @@
       margin-bottom: 30px;
     }
     </style>  
+    <script src='js/formHandler.js'></script>
     </head>
  
   <body class='padBody' style='background-color:#323232;color:white;'>
@@ -49,6 +50,29 @@
         <div class='col-xl-auto' style='width:600px' id='box1'>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac tortor et diam eleifend egestas quis ut augue. Fusce bibendum felis a condimentum sagittis. Quisque placerat nibh nec dictum luctus. Nam tincidunt id magna et dignissim. Duis blandit gravida venenatis. In hac habitasse platea dictumst. Sed et tristique velit, non hendrerit dolor. </p>
           <p>Vestibulum dapibus cursus risus, ac luctus lectus vestibulum ut. Maecenas aliquam, sapien eget ultricies malesuada, magna velit suscipit purus, vel blandit quam augue id velit. Curabitur aliquam sem id nibh mattis auctor. Ut venenatis vulputate massa in tincidunt. Quisque iaculis, ex quis scelerisque viverra, mauris mauris lacinia justo, blandit aliquam lacus lacus id metus. Nunc non ex pretium nunc porttitor molestie. Quisque quis sem euismod ipsum tincidunt suscipit. Etiam vel commodo nisi, at mattis ipsum</p>
+          
+          <form onsubmit="loginFormHandler();return false" id='loginForm'>
+            Email:<br>
+            <input type='text' name='email' required><br>
+            Password:<br>
+            <input type='password' name='password' required>
+            <input type='submit' value='submit'>
+          </form>
+          
+          <form onsubmit="registerFormHandler();return false" id='registerForm'>
+            Email:<br>
+            <input type='text' name='email' required><br>
+            Voornaam:<br>
+            <input type='text' name='firstname' required><br>
+            Achternaam:<br>
+            <input type='text' name='lastname' required><br>
+            Wachtwoord:<br>
+            <input type='password' name='password' required>
+            Wachtwoord opnieuw:<br>
+            <input type='password' name='passwordCheck' required>
+            <input type='submit' value='submit'>
+          </form>
+        
         </div>
         <div class='col-xl-auto align-self-center' style='width:600px' id='box2'>
           <div class="media">
