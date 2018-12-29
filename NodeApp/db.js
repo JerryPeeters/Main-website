@@ -24,7 +24,7 @@ module.exports.queryCollection = async (colName, query) => {
 
     return results;
     } catch(err) {
-        console.log(`The following error occurred when accessing the db: ${err}`);
+        // console.log(`The following error occurred when accessing the db: ${err}`);
         return err;
     }
 }
@@ -41,7 +41,7 @@ module.exports.addDocument = async (colName, document) => {
         // console.log( `Connection to Mongod closed: ${!client.isConnected()}` );   
         return 'pass'
     } catch(err) {
-        console.log(`The following error occurred when accessing the db: ${err}`);
+        // console.log(`The following error occurred when accessing the db: ${err}`);
         return err;
     }
 }

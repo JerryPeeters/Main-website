@@ -46,6 +46,4 @@ module.exports = (request, response) => {
     response.setHeader('Content-type', 
                        contentType[ext] || 'text/plain');
 
-    //to do: add more status codes
-
 }

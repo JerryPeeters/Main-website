@@ -5,20 +5,43 @@ let db = require('../db'),
 
 
 module.exports.login = async (request, response) => {
-    let body = await bodyFromJSONReq(request);
-    body.email = body.email.toLowerCase();
+    let formObj = await bodyFromJSONReq(request);
+    formObj.email = formObj.email.toLowerCase();
 
-    let result = await checkCredentials(body);
+    //get userdata from DB
+    let query = {'email' : formObj.email}
+    let userDB = await db.queryCollection('brownies', query);
 
-    if ( !(result instanceof Error) && result === 'pass' ) {
-        response.writeHead(
-            200, 
-             'OK', 
-            {"Content-Type": "text/plain"}
-            );
-        response.write(`Login succesful!!!`);
-        response.end();    
-    } else send404(result, response);
+    let result = compareCredentials(formObj, userDB);
+    if (result === 'pass') {
+        userDB = userDB[0]; //only obj from the array
+        let cookieObj = await createSessionCookieObj(userDB); //todo
+        //check if cookieObj instanceof Error -> send404
+        
+        // let cookie = createCookie(cookieObj); //todo
+        
+        //add cookie to responseheader 'set-cookie'
+
+        //pipe userHomePage to responsebody
+        //piping already sends response, no need to .end()
+
+
+    } else send404(result, response); //sends Error obj as response
+
+
+
+
+
+    // if ( !(result instanceof Error) && result === 'pass' ) {
+    //     response.writeHead(
+    //         200, 
+    //          'OK', 
+    //         {"Content-Type": "text/plain"}
+    //         );
+    //     response.write(`Login succesful!!!`);
+    //     response.end();    
+    // } else send404(result, response);
+    //send cookie and redirect
 }
 
 module.exports.registerUser = async (request, response) => {
@@ -49,6 +72,46 @@ module.exports.registerUser = async (request, response) => {
 //     return true if logged in based on cookie
 // }
 
+
+/*---------------Internal module functions---------------*/
+
+
+async function createSessionCookieObj(userDB) {
+    //session collection: browniesSessions
+    let cookieObj = {
+        '_id': userDB._id,
+        'value': randomInt(),
+        'expires': Date.now() + (1000*60*30) 
+    };
+
+    let saveCookie = await db.addDocument('browniesSessions', cookieObj);
+    if (saveCookie instanceof Error
+        && saveCookie.message.startsWith("E11000 duplicate key error") ) {
+            console.log('duplication error')
+            //duplicate error, delete document function
+    } 
+    else if (saveCookie === 'pass') {
+        console.log('succes!');
+        //return cookieObj
+    } 
+    else return new Error('Something else went wrong.');
+
+
+    //     saveCookie = deleteDocument('browniesSessions'), 
+    //                                 { '_id' : cookieObj._id };
+    //     //deleteDocument should return error or 'pass'
+    // } else if (saveCookie === 'pass') {
+    //     return cookieObj;
+    // } else return new Error('Error saving cookie')
+}
+
+function randomInt() {
+    let value = Math.random();
+    value = value * 1000000000000000000;
+    value = Math.round(value);
+    return value;
+}
+
 function formatName(str) {
     let name = ''
     str = str.toLowerCase();
@@ -77,9 +140,7 @@ function formatName(str) {
     return str;
 }
 
-async function checkCredentials(obj) {
-    let query = {'email' : obj.email}
-    let userDB = await db.queryCollection('brownies', query);
+function compareCredentials(formObj, userDB) {
 
     if (userDB instanceof Error ) {
         return userDB;
@@ -87,14 +148,14 @@ async function checkCredentials(obj) {
     if (userDB.length != 1 ) {
         return new Error('User not found.')
     }
-    if (obj.email != userDB[0].email ) {
+    if (formObj.email != userDB[0].email ) {
         return new Error('Incorrect email.');
     }
-    if (obj.password != userDB[0].password) {
+    if (formObj.password != userDB[0].password) {
         return new Error('Incorrect password.');
     }
-    if (obj.email == userDB[0].email 
-        && obj.password == userDB[0].password) {
+    if (formObj.email == userDB[0].email 
+        && formObj.password == userDB[0].password) {
             return 'pass';
         }
     else return new Error('Something else went wrong.');
