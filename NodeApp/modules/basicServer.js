@@ -2,7 +2,7 @@
 
 module.exports = (request, response) => {
     
-    let send404 = require('./send404'),
+    let errorHandler = require('./errorHandler'),
         parsedUrl = require('url').parse(request.url),
         ext = require('path').parse(parsedUrl.pathname).ext,
         contentType = {
@@ -29,7 +29,8 @@ module.exports = (request, response) => {
 
     //directory traversal security
     if ( `${filePath}`.includes('../') ) {
-        send404('You\'ve dropped this: ../', response);
+        let error = new Error('You\'ve dropped this: ../')
+        errorHandler(error, request, response);
         return;
     }  
     
@@ -41,7 +42,7 @@ module.exports = (request, response) => {
 
     //server of files
     require('fs').createReadStream(filePath)
-                 .on('error', (err) => send404(err, response ) )
+                 .on('error', (err) => errorHandler(err, request, response ) )
                  .pipe(response);
     response.setHeader('Content-type', 
                        contentType[ext] || 'text/plain');

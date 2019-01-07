@@ -1,9 +1,9 @@
 'use strict';
 
 let http = require('http'),
-    getTimeStamp = require('./modules/getTimeStamp'),
+    tool = require('./modules/genericTools'),
     port = require('./port').portnumber,
-    send404 = require('./modules/send404'),
+    errorHandler = require('./modules/errorHandler'),
     db = require('./db'),
     sessionHandler = require('./modules/sessionHandler');
 
@@ -13,16 +13,16 @@ console.log(`Server now running on port ${port}....`);
 
 function requestHandler(request, response) {
     
-    console.log(`[${getTimeStamp()}]Request: ${request.method} ${request.url}`);
+    console.log(`[${tool.getTimeStamp()}]Request: ${request.method} ${request.url}`);
     
     if (request.url == '/login' 
         && request.method == 'POST') {
-        sessionHandler.login(request, response);
+        require('./modules/loginUser')(request, response);
     }
 
     else if (request.url == '/register'
         && request.method == 'POST') {
-        sessionHandler.registerUser(request, response);
+        require('./modules/registerUser')(request, response);
     }
    
     /*
