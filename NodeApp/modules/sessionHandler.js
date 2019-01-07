@@ -15,7 +15,13 @@ module.exports.login = async (request, response) => {
     let result = compareCredentials(formObj, userDB);
     if (result === 'pass') {
         userDB = userDB[0]; //only obj from the array
-        let cookieObj = await createSessionCookieObj(userDB); //todo
+        let userId = userDB._id;
+        session.createSession(userId);
+       
+       
+       
+       
+        // let cookieObj = await createSessionCookieObj(userDB); //todo
         //check if cookieObj instanceof Error -> send404
         
         // let cookie = createCookie(cookieObj); //todo
@@ -24,7 +30,6 @@ module.exports.login = async (request, response) => {
 
         //pipe userHomePage to responsebody
         //piping already sends response, no need to .end()
-
 
     } else send404(result, response); //sends Error obj as response
 
@@ -74,6 +79,34 @@ module.exports.registerUser = async (request, response) => {
 
 
 /*---------------Internal module functions---------------*/
+
+
+//sessionhandler object
+
+let session = {
+
+    createSession(userId) {
+        let cookieObj = {
+            'userId': userId,
+            'value': randomInt(),
+            'expires': Date.now() + (1000*60*30) 
+        };
+        if (this[userId]) {
+            delete this[userId];
+        };
+        this[userId] = cookieObj;
+        return true;
+    },
+    writeCookie(response, userId) {
+        if (userId === this[userId].userId) {
+            
+        }
+    }
+   /* check session moet de tijd handlen. Ouder dan 30 minuten? Dan delete liveSessions[id] en redirect naar login. Dan is er geen selfdestruct nodig. 
+    check sessions/loggedIn moet de tijd refreshen + een nieuwe cookie sturen voor de expires. Checken alleen aan serverside, expires in cookie
+    is alleen voor de browser. Expires van cookie checken is super kwetsbaar. */
+
+}
 
 
 async function createSessionCookieObj(userDB) {
