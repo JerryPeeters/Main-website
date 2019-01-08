@@ -23,15 +23,10 @@ module.exports = async (request, response) => {
         let userId = query[0]._id; //find() always returns an array
         console.log(`UserId ${userId} logged in successfully.`);
         
-        //do logged in stuff
-        
-        //session.createSession(userId);
-        //session.getCookie
-
-        //add cookie to responseheader 'set-cookie'
-        //pipe userHomePage to responsebody
-        //piping already sends response, no need to .end()
-
+        session.createSession(userId);
+        request.url = '/app/home'    //redirect to app user homepage
+        require('./basicServer')(request, response);
+        return;
     } else { //Unexpected error
         let error = new Error('Something went wrong[3]. Please try logging in again.');
         errorHandler(error, request, response);

@@ -34,6 +34,18 @@ module.exports = (request, response) => {
         return;
     }  
     
+    if ( `${filePath}`.includes('/app') ) {
+        if  ( !session.isLoggedIn(request) ) {
+            let error = new Error('You are not logged in.')
+            errorHandler(error, request, response);
+            return;
+        } else {
+            // setCookie...
+            // then let the rest of the code handle the request
+            //check if double set header is a problem or not.
+        }
+    }  
+    
     // /index.html redirect
     if ( request.url == '/' && request.method == 'GET' ) {
         filePath = './public/html/index.html';
