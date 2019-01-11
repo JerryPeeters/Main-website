@@ -62,7 +62,26 @@ module.exports.getTimeStamp = () => {
     let sec = seconds.length == 1 ? '0' + seconds : seconds;
     
     return `${dd}.${mm}.${yy} ${hh}:${minmin}:${sec}`;
-};
+}
+
+module.exports.parseCookie = (cookie) => {
+    if (!cookie) return new Error('cookie not found');
+    if ( cookie.startsWith('userId=') ) {
+        let start = cookie.indexOf('='),
+            mid = cookie.indexOf('+'),
+            end = cookie.indexOf('-');
+
+        let userId = cookie.slice(start+1, mid),
+            checksum = cookie.slice(mid+1, end);
+
+        let cookieObj = {
+            'userId' : userId, 
+            'checksum' : checksum
+        }
+        return cookieObj;
+
+    } else return new Error('invalid cookie')
+}
 
 module.exports.randomInt = () => {
     let value = Math.random();

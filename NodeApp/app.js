@@ -27,7 +27,7 @@ function requestHandler(request, response) {
    
     /*
     basic webserver 
-    send404 handler
+    errorhandler
     directory traversal security
     */
     else require('./modules/basicServer')(request, response);

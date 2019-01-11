@@ -1,10 +1,11 @@
 'use strict';
 
-module.exports = (request, response) => {
+module.exports = async (request, response) => {
     
     let errorHandler = require('./errorHandler'),
         parsedUrl = require('url').parse(request.url),
         ext = require('path').parse(parsedUrl.pathname).ext,
+        session = require('./sessionHandler'),
         contentType = {
             '.css': 'text/css',
             '.doc': 'application/msword',
@@ -33,16 +34,13 @@ module.exports = (request, response) => {
         errorHandler(error, request, response);
         return;
     }  
-    
-    if ( `${filePath}`.includes('/app') ) {
+
+    //brownies folder only reachable if logged in
+    if ( `${filePath}`.startsWith('./public/brownies') ) {
         if  ( !session.isLoggedIn(request) ) {
             let error = new Error('You are not logged in.')
             errorHandler(error, request, response);
             return;
-        } else {
-            // setCookie...
-            // then let the rest of the code handle the request
-            //check if double set header is a problem or not.
         }
     }  
     
@@ -53,10 +51,9 @@ module.exports = (request, response) => {
     }
 
     //server of files
+    response.setHeader('Content-type', 
+                       contentType[ext] || 'text/plain');
     require('fs').createReadStream(filePath)
                  .on('error', (err) => errorHandler(err, request, response ) )
                  .pipe(response);
-    response.setHeader('Content-type', 
-                       contentType[ext] || 'text/plain');
-
 }

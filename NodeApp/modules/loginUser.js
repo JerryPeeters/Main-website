@@ -24,9 +24,10 @@ module.exports = async (request, response) => {
         console.log(`UserId ${userId} logged in successfully.`);
         
         session.createSession(userId);
-        request.url = '/app/home'    //redirect to app user homepage
-        require('./basicServer')(request, response);
+        response = session.setCookieHeader(response, userId);
+        await serveUserHome(response);
         return;
+
     } else { //Unexpected error
         let error = new Error('Something went wrong[3]. Please try logging in again.');
         errorHandler(error, request, response);
@@ -50,4 +51,11 @@ function checkCredentials(form, query) {
             return 'pass';
         }
     else return new Error('Something else went wrong[2]. Please try logging in again.');
+}
+
+async function serveUserHome(response) {
+    response.setHeader('Content-type', 'text/html');
+    require('fs').createReadStream('./public/brownies/home.html')
+                 .on('error', (err) => errorHandler(err, request, response ) )
+                 .pipe(response);
 }

@@ -8,40 +8,40 @@ let db = require('../db'),
 module.exports = {
 
     createSession(userId) {
-        let cookieObj = {
+        delete this[userId];
+        this[userId] = {
             'userId': userId,
-            'value': randomInt(),
-            'expires': Date.now() + (1000*60*30) 
+            'checksum': tool.randomInt(),
+            'expires': Date.now() + (1000*60*30)
         };
-        if (this[userId]) {
-            delete this[userId];
-        };
-        this[userId] = cookieObj;
         return true;
     },
     setCookieHeader(response, userId) {
-        //checkt eerst isLoggedIn() voor zekerheid, zo nee dan throw error.
-        //set-cookie header
-        if (userId === this[userId].userId) {
-            
-        }
-        //should return response with cookie set
+        let expiresUTC = new Date(this[userId].expires).toUTCString();
+        let cookie = `userId=${userId}+${this[userId].checksum}-; expires=${expiresUTC}; path="/"`;      
+        response.setHeader('Set-Cookie', cookie);
+        return response;
     },
-    async isLoggedIn(request) {
-        let cookie = request.headers.cookie; //untested
-        console.log(cookie);
+    isLoggedIn(request) {
+        let cookie = tool.parseCookie(request.headers.cookie);
+
+        if (cookie instanceof Error) {
+            console.log(`Error parsing cookie: ${cookie}`);
+            return false;
+        };
+
         let userId = cookie.userId;
-        //get useriD, expires and value from cookie
+        let checksum = cookie.checksum;
+
         if (!this[userId]) return false;
 
         if ( this[userId].expires >= Date.now() &&
-             this[userId].value === cookie.value &&
-             this[userId] === cookie.userId &&
-             this[userID].expires === cookie.expires ) {
-                return userId;
+            this[userId].checksum === +checksum ) {
+                return true;
         } else return false;
-        //userId or false
     }
+    //to do: refreshSession(userId)
+
 
 
     //isLoggedIn() -> checkt ook tijd, refresht voor return true. 
